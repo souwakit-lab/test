@@ -136,14 +136,9 @@ let score = 0, luck = 0, level = null, ans = "", currentMul = 1, locked = false,
 let totalQ = 0, correctQ = 0, streak = 0, startTime = null, timer = null, lastUpload = 0, currentInput = "";
 
 const studentData = {
-  "S2D": [{"id":"1","name":"何俊文"},{"id":"2","name":"何曉"},{"id":"3","name":"何鴻澎"},{"id":"4","name":"余敬燊"},{"id":"5","name":"呂家浩"},{"id":"6","name":"李佳玥"},{"id":"7","name":"李卓軒"},{"id":"8","name":"林永鴻"},{"id":"9","name":"林芯瑩"},{"id":"10","name":"林鈴惠"},{"id":"11","name":"林嘉怡"},{"id":"12","name":"林駿業"},{"id":"13","name":"施俊升"},{"id":"14","name":"高詠晴"},{"id":"15","name":"郭子熙"},{"id":"16","name":"陳曉瑩"},{"id":"17","name":"琪旂"},{"id":"18","name":"馮蕙妍"},{"id":"19","name":"黃辰鉉"},{"id":"20","name":"黃宗澤"},{"id":"21","name":"黃婉瑤"},{"id":"22","name":"黃竣顥"},{"id":"23","name":"黃紫翹"},{"id":"24","name":"黃麗蕓"},{"id":"25","name":"葉曉臻"},{"id":"26","name":"劉益菲"},{"id":"27","name":"劉駿龍"},{"id":"28","name":"歐子曦"},{"id":"29","name":"鄧梓俊"},{"id":"30","name":"鄧梓軒"},{"id":"31","name":"鄭宇軒"},{"id":"32","name":"鄭裕馨"},{"id":"33","name":"謝志強"},{"id":"34","name":"蘇鑫陽"}],
-  "S2A": [{"id":"1","name":"何芯儀"},{"id":"2","name":"余佳倚"},{"id":"3","name":"李圳銘"},{"id":"4","name":"李欣澄"},{"id":"5","name":"李芷欣"},{"id":"6","name":"周曉君"},{"id":"7","name":"林宇鋒"},{"id":"8","name":"林宇蕎"},{"id":"9","name":"林汶錛"},{"id":"10","name":"林梓言"},{"id":"11","name":"張子凡"},{"id":"12","name":"梁得志"},{"id":"13","name":"梁凱嵐"},{"id":"14","name":"梁煒煒"},{"id":"15","name":"梁銀嫦"},{"id":"16","name":"梁諾瞳"},{"id":"17","name":"梁駿濠"},{"id":"18","name":"梁耀軒"},{"id":"19","name":"許璟辰"},{"id":"20","name":"陳欣怡"},{"id":"21","name":"陳浩銘"},{"id":"22","name":"湯明軒"},{"id":"23","name":"黃宗盛"},{"id":"24","name":"黃紫瀅"},{"id":"25","name":"詹堯軒"},{"id":"26","name":"雷梓昇"},{"id":"27","name":"趙子韜"},{"id":"28","name":"劉蜜莉"},{"id":"29","name":"歐陽杰枝"},{"id":"30","name":"蔡文立"},{"id":"31","name":"蔣俊杰"},{"id":"32","name":"戴珮淇"},{"id":"33","name":"戴靖峰"},{"id":"34","name":"謝祖盛"},{"id":"35","name":"譚凱胤"}],
-  "S2B": [{"id":"1","name":"朱偉軒"},{"id":"2","name":"何心怡"},{"id":"3","name":"何卓泳"},{"id":"4","name":"何嘉俊"},{"id":"5","name":"吳雪凝"},{"id":"6","name":"李婧雯"},{"id":"7","name":"卓宸億"},{"id":"8","name":"侯詠婷"},{"id":"9","name":"洪浩昌"},{"id":"10","name":"洪嘉昇"},{"id":"11","name":"胡澤琛"},{"id":"12","name":"席俊龍"},{"id":"13","name":"徐浩龍"},{"id":"14","name":"袁承志"},{"id":"15","name":"高梓然"},{"id":"16","name":"張欣然"},{"id":"17","name":"梁家昊"},{"id":"18","name":"畢嘉銃"},{"id":"19","name":"莫津燁"},{"id":"20","name":"許芯怡"},{"id":"21","name":"郭朗庭"},{"id":"22","name":"陳惠研"},{"id":"23","name":"黃至鑫"},{"id":"24","name":"黃琳琳"},{"id":"25","name":"黃詠如"},{"id":"26","name":"楊美鈴"},{"id":"27","name":"趙子朗"},{"id":"28","name":"劉凱鵬"},{"id":"29","name":"潘語瑩"},{"id":"30","name":"蔡奕晟"},{"id":"31","name":"顏成昌"},{"id":"32","name":"譚雪"},{"id":"33","name":"譚源深"},{"id":"34","name":"關嘉雯"},{"id":"35","name":"關騰皓"}],
-  "S2C": [{"id":"1","name":"何曉臻"},{"id":"2","name":"吳俊涵"},{"id":"3","name":"李其峻"},{"id":"4","name":"李紫柔"},{"id":"5","name":"李詩韻"},{"id":"6","name":"林筠浩"},{"id":"7","name":"袁敬曦"},{"id":"8","name":"張凱琳"},{"id":"9","name":"曹俊銘"},{"id":"10","name":"梁峻豪"},{"id":"11","name":"梁浩源"},{"id":"12","name":"梁曼華"},{"id":"13","name":"梁雅晴"},{"id":"14","name":"郭熹霖"},{"id":"15","name":"陳芷熒"},{"id":"16","name":"陳俊昊"},{"id":"17","name":"陳震博"},{"id":"18","name":"陳穎妍"},{"id":"19","name":"陳駿愷"},{"id":"20","name":"黃啓康"},{"id":"21","name":"黃博毅"},{"id":"22","name":"黃智銘"},{"id":"23","name":"黃敬東"},{"id":"24","name":"黃靖儀"},{"id":"25","name":"黃樂軒"},{"id":"26","name":"趙康淇"},{"id":"27","name":"劉子騫"},{"id":"28","name":"歐陽綺瞳"},{"id":"29","name":"潘錦輝"},{"id":"30","name":"蔡梓澄"},{"id":"31","name":"鄭奕烽"},{"id":"32","name":"黎俊彥"},{"id":"33","name":"鍾浩然"},{"id":"34","name":"羅日鑫"},{"id":"35","name":"譚靖瑜"}],
-  "S2E": [{"id":"1","name":"古浩言"},{"id":"2","name":"甘永誠"},{"id":"3","name":"伍彥臻"},{"id":"4","name":"何睿謙"},{"id":"5","name":"吳卓羲"},{"id":"6","name":"吳明軒"},{"id":"7","name":"吳泳恩"},{"id":"8","name":"李浩君"},{"id":"9","name":"李梓睿"},{"id":"10","name":"李穎詩"},{"id":"11","name":"林晞晴"},{"id":"12","name":"林紫淇"},{"id":"13","name":"侯晨睿"},{"id":"14","name":"帥恩昊"},{"id":"15","name":"高智立"},{"id":"16","name":"梁子豪"},{"id":"17","name":"梁敬業"},{"id":"18","name":"梁慶樂"},{"id":"19","name":"許振熙"},{"id":"20","name":"許嘉琪"},{"id":"21","name":"郭美晴"},{"id":"22","name":"陳俊霖"},{"id":"23","name":"陳冠旭"},{"id":"24","name":"陳思函"},{"id":"25","name":"陳衍葶"},{"id":"26","name":"陳駿暉"},{"id":"27","name":"彭芷茵"},{"id":"28","name":"黃卓謙"},{"id":"29","name":"楊雨晞"},{"id":"30","name":"楊美鈺"},{"id":"31","name":"楊添暉"},{"id":"32","name":"趙子傑"},{"id":"33","name":"劉馨琦"},{"id":"34","name":"潘偉濤"},{"id":"35","name":"蔡婧涵"}]
+  "S2D": [{"id":"1","name":"陳大文"},{"id":"2","name":"陳小文"}]
+  "S2E": [{"id":"1","name":"陳大文"},{"id":"2","name":"陳小文"}]
 };
-
-const squares = [1, 4, 9, 16, 25, 36, 49, 64, 81, 100, 121];
 
 function simplifyNumber(n) {
   if (n <= 0) return "0";
@@ -203,12 +198,20 @@ function genType3() {
   }
 }
 
+// 題型四全面升級：支援數字化簡後殘留於根號內
 function genType4() {
   const vars = ["a", "b", "c", "y"].sort(() => Math.random() - 0.5).slice(0, Math.floor(Math.random()*3)+1).sort();
-  let coeff = Math.sqrt(squares[Math.floor(Math.random()*squares.length)]);
-  let qIn = (coeff===1?"":coeff*coeff);
-  let out = (coeff===1?"":coeff.toString());
-  let inP = "";
+  
+  // 決定係數(開出來的數字)與殘留數(留在根號內的數字)
+  const coeff = Math.floor(Math.random() * 5) + 1; // 1~5
+  const leftovers = [1, 2, 3, 5, 6, 7, 10]; // 1代表根號內沒有額外的數字
+  const m = leftovers[Math.floor(Math.random() * leftovers.length)];
+  
+  const originalNum = (coeff * coeff) * m;
+  
+  let qIn = (originalNum === 1 ? "" : originalNum.toString());
+  let out = (coeff === 1 ? "" : coeff.toString());
+  let inP = (m === 1 ? "" : m.toString());
   
   vars.forEach(v => {
     let p = Math.floor(Math.random()*6)+2; 
@@ -218,7 +221,14 @@ function genType4() {
     if(iP>0) inP += v;
   });
   
-  ans = out + (inP ? "√"+inP : ""); 
+  // 若完全沒有係數跟變數 (防呆機制)
+  if (out === "" && inP === "") {
+    ans = "1";
+    qIn = "1";
+  } else {
+    ans = out + (inP ? "√"+inP : "");
+  }
+  
   return `√(${qIn})`;
 }
 
