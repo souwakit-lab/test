@@ -1,0 +1,469 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<title>二次根式化簡訓練助手</title>
+<style>
+  *{box-sizing:border-box;font-family:Microsoft JhengHei,sans-serif}
+  html,body{margin:0;padding:0;width:100%;height:100%;background:#f4f8ff;}
+  body{position:relative;padding:10px;}
+  .card{background:rgba(255,255,255,0.97);border-radius:20px;padding:16px;max-width:500px;width:100%;margin:0 auto;box-shadow:0 0 10px rgba(0,0,0,0.1);}
+  .title{text-align:center;font-size:22px;font-weight:bold;margin:10px 0 14px;}
+  .input-row{display:flex;gap:8px;margin-bottom:12px;width:100%;}
+  .input-row select,.input-row input{flex:1;padding:12px 6px;border-radius:10px;border:1px solid #ccc;font-size:15px;text-align:center;min-width:0;}
+  input#studentName{background:#f0f0f0;}
+  .start-btn{width:100%;padding:14px;background:#378cf9;color:white;border:none;border-radius:12px;font-size:18px;margin-bottom:12px;font-weight:bold;}
+  .start-btn:disabled{background:#ccc;}
+  
+  .level{display:flex;gap:6px;margin:10px 0;}
+  .level button{flex:1;padding:8px 0;margin:0;border-radius:10px;border:none;background:#ddd;font-size:14px;line-height:1.3;}
+  .level .on{background:#378cf9;color:white;}
+  
+  .info{display:flex;justify-content:space-between;margin:8px 0;font-size:15px;}
+  .msg{text-align:center;color:red;font-size:16px;height:24px;font-weight:bold;}
+  .q{text-align:center;font-size:32px;margin:25px 0;font-weight:bold;min-height:80px; display:flex; align-items:center; justify-content:center;}
+  
+  .math-input {
+    width: 100%;
+    padding: 14px;
+    text-align: center;
+    border-radius: 12px;
+    border: 2px solid #378cf9;
+    font-size: 28px;
+    margin-bottom: 10px;
+    min-height: 64px;
+    background: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow-x: auto;
+  }
+
+  .keypad{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin:10px 0;}
+  .key{padding:16px 8px;border:none;border-radius:12px;background:#eef2f5;font-size:22px;}
+  .func{background:#d1f7e5;font-weight:bold;}
+  .btn-bar{display:flex;gap:8px;margin-top:12px;}
+  .btn-bar button{flex:1;padding:14px 4px;border:none;border-radius:12px;color:white;font-size:15px;font-weight:bold;}
+  .reset{background:#ff6666}
+  .ok{background:#378cf9}
+  .luck{background:#ffaa33}
+  .nextBtn{background:#33bb55}
+  .upload{background:#6c757d}
+</style>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
+<script src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
+</head>
+<body>
+
+<div class="card">
+  <div class="title">二次根式化簡訓練助手</div>
+
+  <div class="input-row">
+    <select id="className" onchange="updateStudentList()">
+      <option value="">請選班別</option>
+      <option value="S2A">S2A</option>
+      <option value="S2B">S2B</option>
+      <option value="S2C">S2C</option>
+      <option value="S2D">S2D</option>
+      <option value="S2E">S2E</option>
+    </select>
+
+    <select id="studentId" onchange="autoFillName()" disabled>
+      <option value="">請選學號</option>
+    </select>
+
+    <input id="studentName" placeholder="姓名" disabled readonly>
+  </div>
+
+  <div class="level">
+    <button id="lv1" onclick="setLevel(1)">題型一<br>開平方</button>
+    <button id="lv2" onclick="setLevel(2)">題型二<br>平方計算</button>
+    <button id="lv3" onclick="setLevel(3)">題型三<br>根式乘法</button>
+    <button id="lv4" onclick="setLevel(4)">題型四<br>根式化簡</button>
+  </div>
+
+  <button class="start-btn" id="startBtn" onclick="startGame()" disabled>開始答題</button>
+
+  <div class="info">
+    <div>分數: <span id="score">0</span></div>
+    <div>幸運卡: <span id="luck">0</span>/2</div>
+  </div>
+  <div class="info">
+    <div>答對題數: <span id="correctCount">0</span></div>
+    <div>答對率: <span id="rate">0%</span></div>
+    <div>時間: <span id="time">00:00</span></div>
+  </div>
+
+  <div class="msg" id="msg"></div>
+  <div class="q" id="q"></div>
+  
+  <div id="input-display" class="math-input"><span style="color:#ccc; font-size:18px;">請輸入答案...</span></div>
+
+  <div class="keypad">
+    <button class="key func" onclick="insert('√')">√</button>
+    <button class="key" onclick="insert('a')">a</button>
+    <button class="key" onclick="insert('b')">b</button>
+    <button class="key" onclick="insert('c')">c</button>
+    <button class="key" onclick="insert('y')">y</button>
+    <button class="key" onclick="insert('7')">7</button>
+    <button class="key" onclick="insert('8')">8</button>
+    <button class="key" onclick="insert('9')">9</button>
+    <button class="key" onclick="insert('4')">4</button>
+    <button class="key" onclick="insert('5')">5</button>
+    <button class="key" onclick="insert('6')">6</button>
+    <button class="key" onclick="insert('(')">(</button>
+    <button class="key" onclick="insert('1')">1</button>
+    <button class="key" onclick="insert('2')">2</button>
+    <button class="key" onclick="insert('3')">3</button>
+    <button class="key" onclick="insert(')')">)</button>
+    <button class="key" style="grid-column: span 2;" onclick="insert('0')">0</button>
+    <button class="key func" onclick="insert('^')">xⁿ</button>
+    <button class="key" style="background:#ff9999" onclick="backspace()">⌫</button>
+  </div>
+
+  <div class="btn-bar">
+    <button class="upload" onclick="uploadScore()">上傳</button>
+    <button class="luck" onclick="useLuck()">幸運卡</button>
+    <button class="reset" onclick="clearAll()">清空</button>
+    <button class="ok" onclick="check()">確認</button>
+    <button class="nextBtn" id="nextBtn" onclick="next()" style="display:none">下一題</button>
+  </div>
+</div>
+
+<script>
+let score = 0, luck = 0, level = null, ans = "", currentMul = 1, locked = false, gameStarted = false;
+let totalQ = 0, correctQ = 0, streak = 0, startTime = null, timer = null, lastUpload = 0, currentInput = "";
+
+const studentData = {
+  "S2D": [{"id":"1","name":"何俊文"},{"id":"2","name":"何曉"},{"id":"3","name":"何鴻澎"},{"id":"4","name":"余敬燊"},{"id":"5","name":"呂家浩"},{"id":"6","name":"李佳玥"},{"id":"7","name":"李卓軒"},{"id":"8","name":"林永鴻"},{"id":"9","name":"林芯瑩"},{"id":"10","name":"林鈴惠"},{"id":"11","name":"林嘉怡"},{"id":"12","name":"林駿業"},{"id":"13","name":"施俊升"},{"id":"14","name":"高詠晴"},{"id":"15","name":"郭子熙"},{"id":"16","name":"陳曉瑩"},{"id":"17","name":"琪旂"},{"id":"18","name":"馮蕙妍"},{"id":"19","name":"黃辰鉉"},{"id":"20","name":"黃宗澤"},{"id":"21","name":"黃婉瑤"},{"id":"22","name":"黃竣顥"},{"id":"23","name":"黃紫翹"},{"id":"24","name":"黃麗蕓"},{"id":"25","name":"葉曉臻"},{"id":"26","name":"劉益菲"},{"id":"27","name":"劉駿龍"},{"id":"28","name":"歐子曦"},{"id":"29","name":"鄧梓俊"},{"id":"30","name":"鄧梓軒"},{"id":"31","name":"鄭宇軒"},{"id":"32","name":"鄭裕馨"},{"id":"33","name":"謝志強"},{"id":"34","name":"蘇鑫陽"}],
+  "S2A": [{"id":"1","name":"何芯儀"},{"id":"2","name":"余佳倚"},{"id":"3","name":"李圳銘"},{"id":"4","name":"李欣澄"},{"id":"5","name":"李芷欣"},{"id":"6","name":"周曉君"},{"id":"7","name":"林宇鋒"},{"id":"8","name":"林宇蕎"},{"id":"9","name":"林汶錛"},{"id":"10","name":"林梓言"},{"id":"11","name":"張子凡"},{"id":"12","name":"梁得志"},{"id":"13","name":"梁凱嵐"},{"id":"14","name":"梁煒煒"},{"id":"15","name":"梁銀嫦"},{"id":"16","name":"梁諾瞳"},{"id":"17","name":"梁駿濠"},{"id":"18","name":"梁耀軒"},{"id":"19","name":"許璟辰"},{"id":"20","name":"陳欣怡"},{"id":"21","name":"陳浩銘"},{"id":"22","name":"湯明軒"},{"id":"23","name":"黃宗盛"},{"id":"24","name":"黃紫瀅"},{"id":"25","name":"詹堯軒"},{"id":"26","name":"雷梓昇"},{"id":"27","name":"趙子韜"},{"id":"28","name":"劉蜜莉"},{"id":"29","name":"歐陽杰枝"},{"id":"30","name":"蔡文立"},{"id":"31","name":"蔣俊杰"},{"id":"32","name":"戴珮淇"},{"id":"33","name":"戴靖峰"},{"id":"34","name":"謝祖盛"},{"id":"35","name":"譚凱胤"}],
+  "S2B": [{"id":"1","name":"朱偉軒"},{"id":"2","name":"何心怡"},{"id":"3","name":"何卓泳"},{"id":"4","name":"何嘉俊"},{"id":"5","name":"吳雪凝"},{"id":"6","name":"李婧雯"},{"id":"7","name":"卓宸億"},{"id":"8","name":"侯詠婷"},{"id":"9","name":"洪浩昌"},{"id":"10","name":"洪嘉昇"},{"id":"11","name":"胡澤琛"},{"id":"12","name":"席俊龍"},{"id":"13","name":"徐浩龍"},{"id":"14","name":"袁承志"},{"id":"15","name":"高梓然"},{"id":"16","name":"張欣然"},{"id":"17","name":"梁家昊"},{"id":"18","name":"畢嘉銃"},{"id":"19","name":"莫津燁"},{"id":"20","name":"許芯怡"},{"id":"21","name":"郭朗庭"},{"id":"22","name":"陳惠研"},{"id":"23","name":"黃至鑫"},{"id":"24","name":"黃琳琳"},{"id":"25","name":"黃詠如"},{"id":"26","name":"楊美鈴"},{"id":"27","name":"趙子朗"},{"id":"28","name":"劉凱鵬"},{"id":"29","name":"潘語瑩"},{"id":"30","name":"蔡奕晟"},{"id":"31","name":"顏成昌"},{"id":"32","name":"譚雪"},{"id":"33","name":"譚源深"},{"id":"34","name":"關嘉雯"},{"id":"35","name":"關騰皓"}],
+  "S2C": [{"id":"1","name":"何曉臻"},{"id":"2","name":"吳俊涵"},{"id":"3","name":"李其峻"},{"id":"4","name":"李紫柔"},{"id":"5","name":"李詩韻"},{"id":"6","name":"林筠浩"},{"id":"7","name":"袁敬曦"},{"id":"8","name":"張凱琳"},{"id":"9","name":"曹俊銘"},{"id":"10","name":"梁峻豪"},{"id":"11","name":"梁浩源"},{"id":"12","name":"梁曼華"},{"id":"13","name":"梁雅晴"},{"id":"14","name":"郭熹霖"},{"id":"15","name":"陳芷熒"},{"id":"16","name":"陳俊昊"},{"id":"17","name":"陳震博"},{"id":"18","name":"陳穎妍"},{"id":"19","name":"陳駿愷"},{"id":"20","name":"黃啓康"},{"id":"21","name":"黃博毅"},{"id":"22","name":"黃智銘"},{"id":"23","name":"黃敬東"},{"id":"24","name":"黃靖儀"},{"id":"25","name":"黃樂軒"},{"id":"26","name":"趙康淇"},{"id":"27","name":"劉子騫"},{"id":"28","name":"歐陽綺瞳"},{"id":"29","name":"潘錦輝"},{"id":"30","name":"蔡梓澄"},{"id":"31","name":"鄭奕烽"},{"id":"32","name":"黎俊彥"},{"id":"33","name":"鍾浩然"},{"id":"34","name":"羅日鑫"},{"id":"35","name":"譚靖瑜"}],
+  "S2E": [{"id":"1","name":"古浩言"},{"id":"2","name":"甘永誠"},{"id":"3","name":"伍彥臻"},{"id":"4","name":"何睿謙"},{"id":"5","name":"吳卓羲"},{"id":"6","name":"吳明軒"},{"id":"7","name":"吳泳恩"},{"id":"8","name":"李浩君"},{"id":"9","name":"李梓睿"},{"id":"10","name":"李穎詩"},{"id":"11","name":"林晞晴"},{"id":"12","name":"林紫淇"},{"id":"13","name":"侯晨睿"},{"id":"14","name":"帥恩昊"},{"id":"15","name":"高智立"},{"id":"16","name":"梁子豪"},{"id":"17","name":"梁敬業"},{"id":"18","name":"梁慶樂"},{"id":"19","name":"許振熙"},{"id":"20","name":"許嘉琪"},{"id":"21","name":"郭美晴"},{"id":"22","name":"陳俊霖"},{"id":"23","name":"陳冠旭"},{"id":"24","name":"陳思函"},{"id":"25","name":"陳衍葶"},{"id":"26","name":"陳駿暉"},{"id":"27","name":"彭芷茵"},{"id":"28","name":"黃卓謙"},{"id":"29","name":"楊雨晞"},{"id":"30","name":"楊美鈺"},{"id":"31","name":"楊添暉"},{"id":"32","name":"趙子傑"},{"id":"33","name":"劉馨琦"},{"id":"34","name":"潘偉濤"},{"id":"35","name":"蔡婧涵"}]
+};
+
+const squares = [1, 4, 9, 16, 25, 36, 49, 64, 81, 100, 121];
+
+function simplifyNumber(n) {
+  if (n <= 0) return "0";
+  let coeff = 1, radicand = n;
+  for (let i = 2; i * i <= radicand; i++) {
+    while (radicand % (i * i) === 0) { coeff *= i; radicand /= (i * i); }
+  }
+  if (radicand === 1) return coeff.toString();
+  return (coeff === 1 ? "" : coeff) + "√" + radicand;
+}
+
+function hasOnlySmallPrimes(n) {
+  if (n < 2) return false;
+  const smallPrimes = [2, 3, 5, 7, 11];
+  for (let p of smallPrimes) {
+    while (n % p === 0) n /= p;
+  }
+  return n === 1;
+}
+
+function genType1() { 
+  let k = Math.floor(Math.random()*20)+1; 
+  ans = k.toString(); 
+  return `√(${k*k})`; 
+}
+
+function genType2() { 
+  let k = Math.floor(Math.random()*5)+1;
+  let m = Math.floor(Math.random()*8)+2; 
+  ans = (k*k*m).toString(); 
+  return (k===1) ? `(\\sqrt{${m}})^2` : `(${k}\\sqrt{${m}})^2`; 
+}
+
+function genType3() {
+  const type = Math.floor(Math.random()*3);
+  if (type === 0) {
+    let a, b;
+    do { a = Math.floor(Math.random()*36)+2; } while (!hasOnlySmallPrimes(a));
+    do { b = Math.floor(Math.random()*36)+2; } while (!hasOnlySmallPrimes(b));
+    ans = simplifyNumber(a * b);
+    return `√(${a}) × √(${b})`;
+  } else if (type === 1) {
+    const q = Math.floor(Math.random()*9)+2;
+    const m = Math.floor(Math.random()*9)+2;
+    const p = q * m;
+    const k = Math.floor(Math.random()*4)+2;
+    ans = simplifyNumber(k * k * m);
+    return `${k}√(${p}) × √(\\frac{1}{${q}})`;
+  } else {
+    const s = Math.floor(Math.random()*3)+2;
+    const q = s * s;
+    const c = Math.floor(Math.random()*4)+1;
+    const k = c * s;
+    const p = Math.floor(Math.random()*20)+2;
+    ans = simplifyNumber(c * c * p);
+    return `${k}√(${p}) × √(\\frac{1}{${q}})`;
+  }
+}
+
+function genType4() {
+  const vars = ["a", "b", "c", "y"].sort(() => Math.random() - 0.5).slice(0, Math.floor(Math.random()*3)+1).sort();
+  let coeff = Math.sqrt(squares[Math.floor(Math.random()*squares.length)]);
+  let qIn = (coeff===1?"":coeff*coeff);
+  let out = (coeff===1?"":coeff.toString());
+  let inP = "";
+  
+  vars.forEach(v => {
+    let p = Math.floor(Math.random()*6)+2; 
+    qIn += v + "^" + p;
+    let oP = Math.floor(p/2), iP = p%2;
+    if(oP>0) out += (oP===1?v:v+"^"+oP);
+    if(iP>0) inP += v;
+  });
+  
+  ans = out + (inP ? "√"+inP : ""); 
+  return `√(${qIn})`;
+}
+
+function toLatex(raw) {
+  if (!raw) return "";
+  let s = raw.replace(/√\(([^)]+)\)/g, "\\sqrt{$1}")
+             .replace(/√([a-z0-9^]+)/g, "\\sqrt{$1}")
+             .replace(/\^([0-9]+)/g, "^{$1}")
+             .replace(/×/g, "\\times ");
+  return s;
+}
+
+function renderInput() {
+  const div = document.getElementById("input-display");
+  if (!currentInput) { 
+    div.innerHTML = '<span style="color:#ccc; font-size:18px;">請輸入答案...</span>'; 
+    return; 
+  }
+  try {
+    katex.render(toLatex(currentInput), div, { throwOnError: false });
+  } catch(e) {
+    div.textContent = currentInput;
+  }
+}
+
+function normalizeStr(str) {
+  if (!str || str.trim() === "") return "EMPTY_INPUT"; 
+  let s = str.replace(/\^1(?!\d)/g, "");
+  let parts = s.split("√"), out = parts[0] || "", inn = parts[1] || "";
+  
+  const process = (p) => {
+    if (!p) return "";
+    if (/[a-z][0-9]/.test(p)) return "INVALID_FORMAT";
+    let n = (p.match(/^\d+/) || [""])[0];
+    let v = (p.match(/[a-z](\^\d+)?/g) || []).sort().join("");
+    return ((n==="1" && v!=="") ? "" : n) + v;
+  };
+  
+  return process(out) + (parts.length > 1 ? "√" + process(inn) : "");
+}
+
+function insert(v) { 
+  if(locked || !gameStarted) return; 
+  currentInput += v; 
+  renderInput(); 
+}
+function backspace() { 
+  if(locked || !gameStarted || currentInput.length === 0) return; 
+  currentInput = currentInput.slice(0,-1); 
+  renderInput(); 
+}
+function clearAll() { 
+  if(locked || !gameStarted) return; 
+  currentInput = ""; 
+  renderInput(); 
+}
+
+function check() {
+  if (locked || !gameStarted) return;
+  totalQ++;
+  let userNorm = normalizeStr(currentInput), ansNorm = normalizeStr(ans);
+  
+  if (userNorm === ansNorm && userNorm !== "EMPTY_INPUT") {
+    score = Math.max(0, score + currentMul); 
+    correctQ++; 
+    streak++;
+    document.getElementById("msg").textContent = "正確！ +" + currentMul;
+    
+    let gotLuck = false;
+    if (streak >= 3 && Math.random() < 0.5) {
+      gotLuck = true;
+    } else if (streak === 2 && Math.random() < 0.1) {
+      gotLuck = true;
+    }
+    
+    if (gotLuck && luck < 2) { 
+      luck++; 
+      showMsg("幸運卡 +1！"); 
+    }
+    
+    setTimeout(next, 1500);
+  } else {
+    streak = 0; 
+    score = Math.max(0, score - currentMul);
+    document.getElementById("msg").textContent = "答錯，正解：" + ans.replace(/√([^]*)/, "√($1)");
+    locked = true; 
+    document.getElementById("nextBtn").style.display = "block";
+  }
+  currentMul = 1; 
+  updateUI();
+}
+
+function showMsg(text) {
+  const dom = document.getElementById("msg");
+  dom.textContent = text;
+  if (text.startsWith("正確") || text.includes("幸運卡 +1")) {
+    setTimeout(() => { if(!locked) dom.textContent = ""; }, 1500);
+  }
+}
+
+function next() {
+  locked = false; 
+  currentInput = ""; 
+  currentMul = 1;
+  document.getElementById("nextBtn").style.display = "none";
+  document.getElementById("msg").textContent = "";
+  
+  let qText = (level===1?genType1():level===2?genType2():level===3?genType3():genType4());
+  try {
+    katex.render(toLatex(qText + " = ?"), document.getElementById("q"), { throwOnError: false });
+  } catch(e) {
+    document.getElementById("q").textContent = qText + " = ?";
+  }
+  
+  renderInput(); 
+  updateUI();
+}
+
+function updateUI() {
+  document.getElementById("score").textContent = score;
+  document.getElementById("luck").textContent = luck;
+  document.getElementById("correctCount").textContent = correctQ;
+  document.getElementById("rate").textContent = totalQ === 0 ? "0%" : Math.round(correctQ/totalQ*100) + "%";
+}
+
+function setLevel(n) { 
+  if (gameStarted) return;
+  level = n; 
+  document.querySelectorAll(".level button").forEach((b,i)=>b.classList.toggle("on", i===n-1)); 
+  updateStartBtn(); 
+}
+
+function updateStartBtn() {
+  const c = document.getElementById("className").value.trim();
+  const i = document.getElementById("studentId").value.trim();
+  const n = document.getElementById("studentName").value.trim();
+  document.getElementById("startBtn").disabled = !(c && i && n && level !== null);
+}
+
+function updateStudentList() {
+  const cname = document.getElementById("className").value;
+  const sel = document.getElementById("studentId");
+  const nameInput = document.getElementById("studentName");
+
+  sel.innerHTML = '<option value="">請選學號</option>';
+  nameInput.value = "";
+
+  if (!cname) {
+    sel.disabled = true;
+    updateStartBtn();
+    return;
+  }
+
+  sel.disabled = false;
+  const list = studentData[cname] || [];
+  list.forEach(s => {
+    const opt = document.createElement("option");
+    opt.value = s.id;
+    opt.textContent = s.id;
+    sel.appendChild(opt);
+  });
+  updateStartBtn();
+}
+
+function autoFillName() {
+  const cname = document.getElementById("className").value;
+  const sid = document.getElementById("studentId").value;
+  const list = studentData[cname] || [];
+  const stu = list.find(s => s.id === sid);
+  document.getElementById("studentName").value = stu ? stu.name : "";
+  updateStartBtn();
+}
+
+function startGame() { 
+  gameStarted = true; 
+  document.getElementById("className").disabled = true;
+  document.getElementById("studentId").disabled = true;
+  document.getElementById("studentName").disabled = true;
+  document.getElementById("startBtn").disabled = true;
+  
+  startTime = Date.now(); 
+  timer = setInterval(() => { 
+    let s = Math.floor((Date.now()-startTime)/1000); 
+    document.getElementById("time").textContent = Math.floor(s/60).toString().padStart(2,'0') + ":" + (s%60).toString().padStart(2,'0'); 
+  }, 1000); 
+  
+  next(); 
+}
+
+function useLuck() { 
+  if(!gameStarted || locked || luck < 1) return; 
+  luck--; 
+  currentMul = Math.random()>0.5 ? 2 : 3; 
+  document.getElementById("msg").textContent = "幸運卡生效！本題分數 ×" + currentMul; 
+  updateUI(); 
+}
+
+function getTotalSec() {
+  return startTime ? Math.floor((Date.now() - startTime) / 1000) : 0;
+}
+
+function uploadScore() {
+  if (!gameStarted) {
+    alert("請先開始答題");
+    return;
+  }
+  if (Date.now() - lastUpload < 5000) {
+    alert("上傳過於頻繁，請稍後再試");
+    return;
+  }
+
+  const className = document.getElementById("className").value.trim();
+  const studentId = document.getElementById("studentId").value.trim();
+  const studentName = document.getElementById("studentName").value.trim();
+  const rateValue = totalQ === 0 ? "0" : (correctQ / totalQ * 100).toFixed(1);
+  const levelValue = level === 1 ? "題型一" : level === 2 ? "題型二" : level === 3 ? "題型三" : "題型四";
+
+  const GAS_URL = "https://script.google.com/macros/s/AKfycbyHFGxezML6QQsxvYDIR7t9nx28549ZcxukGITGCpSTH0dmJAYnOIcypGZrJKWELSUl/exec";
+
+  const data = {
+    action: "saveScore",
+    className: className,
+    studentId: studentId,
+    studentName: studentName,
+    score: score,
+    correct: correctQ,
+    rate: rateValue,
+    level: levelValue,
+    timeSec: getTotalSec()
+  };
+
+  fetch(GAS_URL, {
+    method: "POST",
+    mode: "no-cors",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(data)
+  })
+  .then(() => {
+    alert("上傳成功！\n\n班級：" + className + "\n學號：" + studentId + "\n姓名：" + studentName + "\n分數：" + score + "\n答對題數：" + correctQ + "\n答對率：" + rateValue + "%");
+    lastUpload = Date.now();
+  })
+  .catch(() => {
+    alert("上傳失敗，請檢查網路");
+  });
+}
+</script>
+</body>
+</html>
